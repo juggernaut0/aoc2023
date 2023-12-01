@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
@@ -51,9 +49,7 @@ fn find_first_digit(s: &str, re: &Regex) -> i32 {
     re.find(s)
         .map(|m| {
             let s = m.as_str();
-            NUMS.get(s)
-                .copied()
-                .unwrap_or_else(|| s.parse::<i32>().unwrap())
+            NUMS.get(s).copied().unwrap_or_else(|| s.parse().unwrap())
         })
         .unwrap()
 }
@@ -62,10 +58,7 @@ fn find_last_digit(s: &str, re: &Regex) -> i32 {
     for i in (0..=s.len()).rev() {
         if let Some(m) = re.find(&s[i..]) {
             let s = m.as_str();
-            return NUMS
-                .get(s)
-                .copied()
-                .unwrap_or_else(|| s.parse::<i32>().unwrap());
+            return NUMS.get(s).copied().unwrap_or_else(|| s.parse().unwrap());
         }
     }
     unreachable!()

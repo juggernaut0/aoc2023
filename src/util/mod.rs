@@ -21,3 +21,7 @@ pub fn parse_lines_with<'a, T, P: FnMut(&'a str) -> T + 'a>(
 ) -> impl Iterator<Item = T> + 'a {
     input.lines().map(parser)
 }
+
+fn rev_chars(s: &str) -> String {
+    s.chars().rev().collect()
+}
