@@ -64,7 +64,7 @@ pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
 
         if let Some((_, best_v)) = best.as_ref() {
             if &value_est <= best_v {
-                continue
+                continue;
             }
         }
 
@@ -80,14 +80,14 @@ pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
             if let Some((_, best_v)) = best.as_ref() {
                 if &value > best_v {
                     best = Some((s, value));
-                    continue
+                    continue;
                 }
             } else {
                 best = Some((s, value));
                 if break_on_goal {
-                    break
+                    break;
                 } else {
-                    continue
+                    continue;
                 }
             }
         }
