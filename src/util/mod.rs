@@ -22,6 +22,13 @@ pub fn parse_lines_with<'a, T, P: FnMut(&'a str) -> T + 'a>(
     input.lines().map(parser)
 }
 
-fn rev_chars(s: &str) -> String {
+pub fn rev_chars(s: &str) -> String {
     s.chars().rev().collect()
+}
+
+pub fn split_once<'a>(s: &'a str, splitter: &str) -> Option<(&'a str, &'a str)> {
+    let mut parts = s.splitn(2, splitter);
+    let a = parts.next().unwrap();
+    let b = parts.next()?;
+    Some((a, b))
 }

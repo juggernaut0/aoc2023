@@ -65,7 +65,7 @@ fn main() {
                 .value_parser(clap::value_parser!(u32).range(1..=25))
                 .required(true),
         )
-        .arg(Arg::new("puzzle").value_parser(["1", "2"]).required(true))
+        .arg(Arg::new("puzzle").value_parser(["1", "2"]))
         .arg(
             Arg::new("log_level")
                 .long("level")
@@ -90,27 +90,46 @@ fn main() {
     simple_logger::init_with_level(log_level).unwrap();
 
     let day: usize = matches.get_one("day").map(|it: &u32| *it as usize).unwrap();
-    let puzzle: &String = matches.get_one("puzzle").unwrap();
+    let puzzle: Option<&String> = matches.get_one("puzzle");
 
-    let input = {
-        let dss = format!("input/{}-{}.txt", day, puzzle);
-        let ds = std::path::Path::new(&dss);
-        if ds.exists() {
-            std::fs::read_to_string(ds).unwrap()
-        } else {
-            std::fs::read_to_string(format!("input/{}.txt", day)).unwrap()
+    let solution = DAYS[day - 1];
+
+    let (answer, time) = match puzzle.map(|it| it.as_str()) {
+        Some("1") => {
+            let input = read_input(day, "1");
+            time(|| solution.solve_1(input))
+        }
+        Some("2") => {
+            let input = read_input(day, "2");
+            time(|| solution.solve_1(input))
+        }
+        Some(_) => unreachable!(),
+        None => {
+            let input_1 = read_input(day, "1");
+            let input_2 = read_input(day, "2");
+            let ((a1, a2), time) = time(|| (solution.solve_1(input_1), solution.solve_2(input_2)));
+            (a1 + "\n" + &a2, time)
         }
     };
 
-    let solution = DAYS[day - 1];
+    println!("{answer}");
+    println!("Elapsed: {time}ms");
+}
+
+fn read_input(day: usize, puzzle: &str) -> String {
+    let dss = format!("input/{}-{}.txt", day, puzzle);
+    let ds = std::path::Path::new(&dss);
+    if ds.exists() {
+        std::fs::read_to_string(ds).unwrap()
+    } else {
+        std::fs::read_to_string(format!("input/{}.txt", day)).unwrap()
+    }
+}
+
+fn time<T>(f: impl FnOnce() -> T) -> (T, u128) {
     let start = Instant::now();
-    let answer = match puzzle.as_str() {
-        "1" => solution.solve_1(input),
-        "2" => solution.solve_2(input),
-        _ => unreachable!(),
-    };
-    println!("{}", answer);
-    println!("Elapsed: {}ms", start.elapsed().as_millis());
+    let res = f();
+    (res, start.elapsed().as_millis())
 }
 
 trait Solution {
