@@ -101,7 +101,7 @@ fn main() {
         }
         Some("2") => {
             let input = read_input(day, "2");
-            time(|| solution.solve_1(input))
+            time(|| solution.solve_2(input))
         }
         Some(_) => unreachable!(),
         None => {

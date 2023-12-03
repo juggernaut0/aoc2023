@@ -1,4 +1,6 @@
+#![allow(dead_code)]
 mod counter;
+mod grid;
 mod point;
 mod search;
 

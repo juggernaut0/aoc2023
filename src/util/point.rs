@@ -1,8 +1,8 @@
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::ops::Add;
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
-struct Point(i32, i32);
+pub struct Point(pub i32, pub i32);
 
 impl Point {
     fn zero() -> Point {
@@ -21,6 +21,19 @@ impl Point {
             Point(self.0, self.1 - 1),
         ]
     }
+
+    pub fn adj_diag(self) -> [Point; 8] {
+        [
+            Point(self.0 - 1, self.1 - 1),
+            Point(self.0 - 1, self.1),
+            Point(self.0 - 1, self.1 + 1),
+            Point(self.0, self.1 - 1),
+            Point(self.0, self.1 + 1),
+            Point(self.0 + 1, self.1 - 1),
+            Point(self.0 + 1, self.1),
+            Point(self.0 + 1, self.1 + 1),
+        ]
+    }
 }
 
 impl Add for Point {
@@ -32,6 +45,13 @@ impl Add for Point {
 }
 
 impl Display for Point {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let (x, y) = (self.0, self.1);
+        write!(f, "({x}, {y})")
+    }
+}
+
+impl Debug for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let (x, y) = (self.0, self.1);
         write!(f, "({x}, {y})")
