@@ -16,19 +16,16 @@ impl crate::Solution for Solution {
 
     fn solve_2(&self, input: String) -> String {
         let cards: Vec<Card> = parse_lines(&input).collect();
-        let mut cache = HashMap::new();
-        let mut total = cards.len();
-        for card in cards.iter().rev() {
+        let mut counts = vec![1; cards.len()];
+        for card in cards {
             let id = card.id;
+            let count = counts[id - 1];
             let matches = card.matches();
-            let mut subtotal = matches;
             for i in 0..matches {
-                subtotal += cache.get(&(id + i + 1)).expect("missing a cache entry");
+                counts[id + i] += count;
             }
-            total += subtotal;
-            cache.insert(id, subtotal);
         }
-        total.to_string()
+        counts.into_iter().sum::<usize>().to_string()
     }
 }
 
