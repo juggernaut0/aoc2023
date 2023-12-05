@@ -53,7 +53,6 @@ impl Display for Point {
 
 impl Debug for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let (x, y) = (self.0, self.1);
-        write!(f, "({x}, {y})")
+        write!(f, "{self}")
     }
 }

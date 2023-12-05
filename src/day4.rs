@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 
 use crate::util::{parse_lines, split_once};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::str::FromStr;
 
 pub struct Solution;
@@ -69,13 +69,11 @@ impl FromStr for Card {
 
         let (winning_str, picked_str) = split_once(tail, "|").ok_or_else(|| s.to_string())?;
         let winning = winning_str
-            .split(' ')
-            .filter(|it| !it.is_empty())
+            .split_ascii_whitespace()
             .map(|it| it.parse().unwrap())
             .collect();
         let picked = picked_str
-            .split(' ')
-            .filter(|it| !it.is_empty())
+            .split_ascii_whitespace()
             .map(|it| it.parse().unwrap())
             .collect();
         Ok(Card {
