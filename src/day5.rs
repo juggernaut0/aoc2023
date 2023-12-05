@@ -71,7 +71,7 @@ impl MapEntry {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 struct Map {
     entries: Vec<MapEntry>,
 }
@@ -156,75 +156,71 @@ earlier map corresponds to exactly one entry in the later map
 */
 fn split_map(earlier: &mut Map, later: &Map) {
     // maps are sorted by source start
-    let mut res = Map::default();
+    let cut_points: Vec<_> = later
+        .entries
+        .iter()
+        .map(|le| le.source.start)
+        .chain([later.entries.last().unwrap().source.end])
+        .collect();
 
-    let mut entries = std::mem::take(&mut earlier.entries).into_iter();
-    let mut entry = entries.next();
+    let mut res = Vec::new();
 
-    while let Some(remaining) = entry {
-        let containing = later
-            .entries
+    let mut entries = std::mem::take(&mut earlier.entries);
+
+    while let Some(entry) = entries.pop() {
+        let cutter = cut_points
             .iter()
-            .find(|later_entry| later_entry.source.contains(&remaining.dest_start));
-        if let Some(containing) = containing {
-            if remaining.dest_end() <= containing.source.end {
-                res.entries.push(remaining);
-                entry = entries.next();
-                continue;
-            }
-
+            .find(|c| ((entry.dest_start + 1)..entry.dest_end()).contains(c));
+        if let Some(cutter) = cutter {
             log::debug!(
                 "cutting {}..{} at {}",
-                remaining.dest_start,
-                remaining.dest_end(),
-                containing.source.end
+                entry.dest_start,
+                entry.dest_end(),
+                cutter,
             );
-            let d = containing.source.end - remaining.dest_start;
+            let d = cutter - entry.dest_start;
             let prefix = MapEntry {
-                source: remaining.source.start..(remaining.source.start + d),
-                dest_start: remaining.dest_start,
+                source: entry.source.start..(entry.source.start + d),
+                dest_start: entry.dest_start,
             };
-            res.entries.push(prefix);
-            entry = Some(MapEntry {
-                source: (remaining.source.start + d)..remaining.source.end,
-                dest_start: remaining.dest_start + d,
-            });
+            let suffix = MapEntry {
+                source: (entry.source.start + d)..entry.source.end,
+                dest_start: entry.dest_start + d,
+            };
+            entries.push(prefix);
+            entries.push(suffix);
         } else {
-            log::debug!("{} was not in a range", remaining.dest_start);
+            log::debug!("{} was not in a range", entry.dest_start);
 
-            let first_later = match later.entries.iter().find(|e| {
-                e.source.start > remaining.dest_start && e.source.start < remaining.dest_end()
-            }) {
-                Some(e) => e,
-                None => {
-                    res.entries.push(remaining);
-                    entry = entries.next();
-                    continue;
-                }
-            };
-
-            log::debug!(
-                "cutting {}..{} at {}",
-                remaining.dest_start,
-                remaining.dest_end(),
-                first_later.source.start
-            );
-
-            let d = first_later.source.start - remaining.dest_start;
-            let prefix = MapEntry {
-                source: remaining.source.start..(remaining.source.start + d),
-                dest_start: remaining.dest_start,
-            };
-            res.entries.push(prefix);
-            entry = Some(MapEntry {
-                source: (remaining.source.start + d)..remaining.source.end,
-                dest_start: remaining.dest_start + d,
-            })
+            res.push(entry);
         }
     }
-    res.entries.sort_by_key(|it| it.source.start);
 
-    *earlier = res
+    #[cfg(debug_assertions)]
+    {
+        for e in &res {
+            let a = later
+                .entries
+                .iter()
+                .find(|it| it.source.contains(&e.dest_start));
+            let b = later
+                .entries
+                .iter()
+                .find(|it| it.source.contains(&(e.dest_end() - 1)));
+
+            assert_eq!(
+                a,
+                b,
+                "ds {} de {} later {:#?}",
+                e.dest_start,
+                e.dest_end(),
+                later.entries
+            );
+            assert_eq!(later.apply(e.dest_start + 1), later.apply(e.dest_start) + 1);
+        }
+    }
+
+    *earlier = Map::new(res);
 }
 
 #[cfg(test)]
