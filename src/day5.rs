@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::ops::Range;
 
 pub struct Solution;
@@ -14,7 +15,8 @@ impl crate::Solution for Solution {
     }
 
     fn solve_2(&self, input: String) -> String {
-        let (seeds, mut maps) = parse_input(input);
+        let (seeds, maps) = parse_input(input);
+        let maps: Vec<_> = maps.into_iter().map(RefCell::new).collect();
 
         let seed_map_entries = seeds
             .chunks(2)
@@ -26,33 +28,17 @@ impl crate::Solution for Solution {
         let mut seed_map = Map {
             entries: seed_map_entries,
         };
-        seed_map.entries.sort_by_key(|it| it.source.start);
 
-        let m6 = maps.pop().unwrap();
-        let mut m5 = maps.pop().unwrap();
-        let mut m4 = maps.pop().unwrap();
-        let mut m3 = maps.pop().unwrap();
-        let mut m2 = maps.pop().unwrap();
-        let mut m1 = maps.pop().unwrap();
-        let mut m0 = maps.pop().unwrap();
-
-        assert!(maps.is_empty(), "map isn't empty!");
-
-        split_map(&mut m5, &m6);
-        split_map(&mut m4, &m5);
-        split_map(&mut m3, &m4);
-        split_map(&mut m2, &m3);
-        split_map(&mut m1, &m2);
-        split_map(&mut m0, &m1);
-        split_map(&mut seed_map, &m0);
-
-        maps = vec![m0, m1, m2, m3, m4, m5, m6];
+        for wind in maps.windows(2).rev() {
+            split_map(&mut wind[0].borrow_mut(), &wind[1].borrow());
+        }
+        split_map(&mut seed_map, &maps[0].borrow());
 
         seed_map
             .entries
             .into_iter()
             .map(|e| e.dest_start)
-            .map(|seed| maps.iter().fold(seed, |n, map| map.apply(n)))
+            .map(|seed| maps.iter().fold(seed, |n, map| map.borrow().apply(n)))
             .min()
             .unwrap()
             .to_string()
