@@ -101,41 +101,26 @@ impl Hand {
             groups[card as usize] += 1;
         }
 
-        let jokers = if self.joker_rule {
+        if self.joker_rule {
             let j = groups[0];
             groups[0] = 0;
-            j
-        } else {
-            0
-        };
-
-        fn is_full_house(groups: &[u8; 13], jokers: u8) -> bool {
-            if jokers == 0 {
-                groups.iter().any(|c| *c == 3) && groups.iter().any(|c| *c == 2)
-            } else {
-                is_two_pair(groups, jokers - 1)
-            }
+            let highest = groups.iter_mut().max().unwrap();
+            *highest += j;
         }
 
-        fn is_two_pair(groups: &[u8; 13], jokers: u8) -> bool {
-            if jokers == 0 {
-                groups.iter().filter(|c| **c == 2).count() == 2
-            } else {
-                groups.iter().any(|c| *c == 2)
-            }
-        }
+        groups.sort();
 
-        if groups.iter().any(|c| *c == 5 - jokers) {
+        if groups[12] == 5 {
             Type::FiveOfKind
-        } else if groups.iter().any(|c| *c == 4 - jokers) {
+        } else if groups[12] == 4 {
             Type::FourOfKind
-        } else if is_full_house(&groups, jokers) {
+        } else if groups[12] == 3 && groups[11] == 2 {
             Type::FullHouse
-        } else if groups.iter().any(|c| *c == 3 - jokers) {
+        } else if groups[12] == 3 {
             Type::ThreeOfKind
-        } else if is_two_pair(&groups, jokers) {
+        } else if groups[12] == 2 && groups[11] == 2 {
             Type::TwoPair
-        } else if groups.iter().any(|c| *c == 2 - jokers) {
+        } else if groups[12] == 2 {
             Type::OnePair
         } else {
             Type::HighCard
