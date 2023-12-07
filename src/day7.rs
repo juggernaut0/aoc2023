@@ -1,13 +1,199 @@
-#![allow(unused_variables)]
+use crate::util::{parse_lines, split_once};
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 pub struct Solution;
 
 impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
-        todo!()
+        let mut hands: Vec<HandBid> = parse_lines(&input).collect();
+        hands.sort_by(|a, b| a.hand.cmp(&b.hand));
+        sum_winnings(hands)
     }
 
     fn solve_2(&self, input: String) -> String {
-        todo!()
+        let mut hands: Vec<HandBid> = parse_lines(&input).collect();
+        for hand in &mut hands {
+            hand.hand.translate_to_part_2();
+        }
+        hands.sort_by(|a, b| a.hand.cmp(&b.hand));
+        sum_winnings(hands)
+    }
+}
+
+fn sum_winnings(hands: Vec<HandBid>) -> String {
+    hands
+        .into_iter()
+        .enumerate()
+        .map(|(i, hb)| {
+            let rank = (i + 1) as u32;
+            rank * hb.bid
+        })
+        .sum::<u32>()
+        .to_string()
+}
+
+struct HandBid {
+    hand: Hand,
+    bid: u32,
+}
+
+impl FromStr for HandBid {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (hand_str, bid_str) = split_once(s, " ").unwrap();
+        let cards = hand_str
+            .chars()
+            .map(card_value)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        let hand = Hand {
+            cards,
+            joker_rule: false,
+        };
+        let bid = bid_str.parse().unwrap();
+        Ok(HandBid { hand, bid })
+    }
+}
+
+fn card_value(c: char) -> u8 {
+    match c {
+        '2' => 0,
+        '3' => 1,
+        '4' => 2,
+        '5' => 3,
+        '6' => 4,
+        '7' => 5,
+        '8' => 6,
+        '9' => 7,
+        'T' => 8,
+        'J' => 9,
+        'Q' => 10,
+        'K' => 11,
+        'A' => 12,
+        _ => panic!("card {c}"),
+    }
+}
+
+#[derive(Eq, PartialEq)]
+struct Hand {
+    cards: [u8; 5],
+    joker_rule: bool,
+}
+
+impl Hand {
+    fn translate_to_part_2(&mut self) {
+        self.joker_rule = true;
+        for i in 0..5 {
+            match self.cards[i].cmp(&9) {
+                Ordering::Less => self.cards[i] += 1,
+                Ordering::Equal => self.cards[i] = 0,
+                _ => {}
+            }
+        }
+    }
+
+    fn get_type(&self) -> Type {
+        let mut groups = [0u8; 13];
+        for card in self.cards {
+            groups[card as usize] += 1;
+        }
+
+        let jokers = if self.joker_rule {
+            let j = groups[0];
+            groups[0] = 0;
+            j
+        } else {
+            0
+        };
+
+        fn is_full_house(groups: &[u8; 13], jokers: u8) -> bool {
+            if jokers == 0 {
+                groups.iter().any(|c| *c == 3) && groups.iter().any(|c| *c == 2)
+            } else {
+                is_two_pair(groups, jokers - 1)
+            }
+        }
+
+        fn is_two_pair(groups: &[u8; 13], jokers: u8) -> bool {
+            if jokers == 0 {
+                groups.iter().filter(|c| **c == 2).count() == 2
+            } else {
+                groups.iter().any(|c| *c == 2)
+            }
+        }
+
+        if groups.iter().any(|c| *c == 5 - jokers) {
+            Type::FiveOfKind
+        } else if groups.iter().any(|c| *c == 4 - jokers) {
+            Type::FourOfKind
+        } else if is_full_house(&groups, jokers) {
+            Type::FullHouse
+        } else if groups.iter().any(|c| *c == 3 - jokers) {
+            Type::ThreeOfKind
+        } else if is_two_pair(&groups, jokers) {
+            Type::TwoPair
+        } else if groups.iter().any(|c| *c == 2 - jokers) {
+            Type::OnePair
+        } else {
+            Type::HighCard
+        }
+    }
+}
+
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Debug)]
+enum Type {
+    HighCard,
+    OnePair,
+    TwoPair,
+    ThreeOfKind,
+    FullHouse,
+    FourOfKind,
+    FiveOfKind,
+}
+
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Hand {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self == other {
+            return Ordering::Equal;
+        }
+
+        let type_cmp = self.get_type().cmp(&other.get_type());
+        if type_cmp != Ordering::Equal {
+            type_cmp
+        } else {
+            self.cards.cmp(&other.cards)
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::day7::Solution;
+    use crate::init_test_logging;
+
+    #[test]
+    fn ex2() {
+        use crate::Solution;
+        init_test_logging();
+
+        let input = "32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483"
+            .to_string();
+
+        let res = Solution.solve_2(input);
+
+        assert_eq!("5905", res);
     }
 }
