@@ -102,25 +102,25 @@ impl Hand {
         }
 
         if self.joker_rule {
-            let j = groups[0];
-            groups[0] = 0;
+            let j = std::mem::take(&mut groups[0]);
             let highest = groups.iter_mut().max().unwrap();
             *highest += j;
         }
 
-        groups.sort();
+        let highest = std::mem::take(groups.iter_mut().max().unwrap());
+        let second = groups.into_iter().max().unwrap();
 
-        if groups[12] == 5 {
+        if highest == 5 {
             Type::FiveOfKind
-        } else if groups[12] == 4 {
+        } else if highest == 4 {
             Type::FourOfKind
-        } else if groups[12] == 3 && groups[11] == 2 {
+        } else if highest == 3 && second == 2 {
             Type::FullHouse
-        } else if groups[12] == 3 {
+        } else if highest == 3 {
             Type::ThreeOfKind
-        } else if groups[12] == 2 && groups[11] == 2 {
+        } else if highest == 2 && second == 2 {
             Type::TwoPair
-        } else if groups[12] == 2 {
+        } else if highest == 2 {
             Type::OnePair
         } else {
             Type::HighCard
