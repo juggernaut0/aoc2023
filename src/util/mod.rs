@@ -34,3 +34,19 @@ pub fn split_once<'a>(s: &'a str, splitter: &str) -> Option<(&'a str, &'a str)> 
     let b = parts.next()?;
     Some((a, b))
 }
+
+pub fn gcd(mut a: u64, mut b: u64) -> u64 {
+    loop {
+        if b == 0 {
+            return a;
+        } else {
+            let t = a % b;
+            a = b;
+            b = t;
+        }
+    }
+}
+
+pub fn lcm(a: u64, b: u64) -> u64 {
+    (a * b) / gcd(a, b)
+}
