@@ -13,7 +13,7 @@ impl Point {
         (self.0 - other.0).abs() + (self.1 - other.1).abs()
     }
 
-    fn adj(self) -> [Point; 4] {
+    pub fn adj(self) -> [Point; 4] {
         [
             Point(self.0 + 1, self.1),
             Point(self.0, self.1 + 1),

@@ -5,6 +5,7 @@ mod point;
 mod search;
 
 pub use counter::*;
+pub use grid::*;
 pub use point::*;
 pub use search::*;
 use std::fmt::Debug;

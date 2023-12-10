@@ -25,6 +25,33 @@ impl<T> Grid<T> {
             .get(p.1 as usize)
             .and_then(|row| row.get(p.0 as usize))
     }
+
+    pub fn set(&mut self, p: Point, t: T) -> Option<T> {
+        let Point(x, y) = p;
+        if let Some(row) = self.data.get_mut(y as usize) {
+            if let Some(old) = row.get_mut(x as usize) {
+                let old = std::mem::replace(old, t);
+                Some(old)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn points(&self) -> impl Iterator<Item = Point> + '_ {
+        (0..self.data.len())
+            .flat_map(|y| (0..self.data[y].len()).map(move |x| Point(x as i32, y as i32)))
+    }
+
+    pub fn points_with_item(&self) -> impl Iterator<Item = (Point, &T)> {
+        self.data.iter().enumerate().flat_map(|(y, row)| {
+            row.iter()
+                .enumerate()
+                .map(move |(x, t)| (Point(x as i32, y as i32), t))
+        })
+    }
 }
 
 impl<T: From<char>> FromStr for Grid<T> {
