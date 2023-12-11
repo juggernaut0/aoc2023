@@ -9,7 +9,7 @@ impl Point {
         Point(0, 0)
     }
 
-    fn l1dist(self, other: Point) -> i32 {
+    pub fn l1dist(self, other: Point) -> i32 {
         (self.0 - other.0).abs() + (self.1 - other.1).abs()
     }
 
