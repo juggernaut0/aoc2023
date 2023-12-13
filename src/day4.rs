@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-use crate::util::{parse_lines, split_once};
+use crate::util::parse_lines;
 use std::collections::HashSet;
 use std::str::FromStr;
 
@@ -57,7 +57,7 @@ impl FromStr for Card {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (head, tail) = split_once(s, ":").ok_or_else(|| s.to_string())?;
+        let (head, tail) = s.split_once(':').ok_or_else(|| s.to_string())?;
 
         let id = head
             .chars()
@@ -67,7 +67,7 @@ impl FromStr for Card {
             .parse()
             .map_err(|_| s.to_string())?;
 
-        let (winning_str, picked_str) = split_once(tail, "|").ok_or_else(|| s.to_string())?;
+        let (winning_str, picked_str) = tail.split_once('|').ok_or_else(|| s.to_string())?;
         let winning = winning_str
             .split_ascii_whitespace()
             .map(|it| it.parse().unwrap())

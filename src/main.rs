@@ -70,7 +70,7 @@ fn main() {
             Arg::new("log_level")
                 .long("level")
                 .help("Logging level")
-                .default_value("info"),
+                .default_value("warn"),
         )
         .get_matches();
 
@@ -84,7 +84,7 @@ fn main() {
         "info" => Level::Info,
         "warn" => Level::Warn,
         "error" => Level::Error,
-        _ => Level::Info,
+        _ => Level::Warn,
     };
 
     simple_logger::init_with_level(log_level).unwrap();

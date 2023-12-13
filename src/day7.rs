@@ -1,4 +1,4 @@
-use crate::util::{parse_lines, split_once};
+use crate::util::parse_lines;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
@@ -42,7 +42,7 @@ impl FromStr for HandBid {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (hand_str, bid_str) = split_once(s, " ").unwrap();
+        let (hand_str, bid_str) = s.split_once(' ').unwrap();
         let cards = hand_str
             .chars()
             .map(card_value)

@@ -1,4 +1,4 @@
-use crate::util::{parse_lines, split_once};
+use crate::util::parse_lines;
 use std::str::FromStr;
 
 pub struct Solution;
@@ -59,7 +59,7 @@ impl FromStr for Game {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (head, tail) = split_once(s, ":").ok_or_else(|| s.to_string())?;
+        let (head, tail) = s.split_once(':').ok_or_else(|| s.to_string())?;
 
         let id: i32 = head
             .chars()
@@ -72,8 +72,10 @@ impl FromStr for Game {
         for pick_str in tail.split(';') {
             let mut pick = Pick::default();
             for color_n_str in pick_str.split(',') {
-                let (n_str, color) =
-                    split_once(color_n_str.trim(), " ").ok_or_else(|| color_n_str.to_string())?;
+                let (n_str, color) = color_n_str
+                    .trim()
+                    .split_once(' ')
+                    .ok_or_else(|| color_n_str.to_string())?;
                 let n: i32 = n_str.parse().map_err(|_| s.to_string())?;
 
                 match color {

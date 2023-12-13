@@ -29,13 +29,6 @@ pub fn rev_chars(s: &str) -> String {
     s.chars().rev().collect()
 }
 
-pub fn split_once<'a>(s: &'a str, splitter: &str) -> Option<(&'a str, &'a str)> {
-    let mut parts = s.splitn(2, splitter);
-    let a = parts.next().unwrap();
-    let b = parts.next()?;
-    Some((a, b))
-}
-
 pub fn gcd(mut a: u64, mut b: u64) -> u64 {
     loop {
         if b == 0 {
