@@ -93,46 +93,45 @@ impl Springs {
         let conds = &self.conditions;
         let checks = &self.checks;
         let mut table = vec![vec![0; checks.len() + 1]; conds.len() + 1];
-        // component of each table entry that comes from the possibility of condition == damaged
-        let mut da_comp = vec![vec![0; checks.len() + 1]; conds.len() + 1];
+        table[0][0] = 1;
 
         for check_i in 0..=checks.len() {
-            if check_i == 0 {
-                for cond_i in 0..=conds.len() {
-                    table[cond_i][0] = if cond_i == 0 {
-                        1
-                    } else if conds[cond_i - 1] == Condition::Damaged {
-                        0
-                    } else {
-                        table[cond_i - 1][0]
-                    };
+            let check = if check_i == 0 { 0 } else { checks[check_i - 1] };
+            for cond_i in 1..=conds.len() {
+                if cond_i < check {
+                    continue;
                 }
-            } else {
-                let check = checks[check_i - 1];
-                for cond_i in 1..=conds.len() {
-                    if cond_i >= check {
-                        let op = table[cond_i - 1][check_i];
-                        let da = if conds[cond_i - check..cond_i].contains(&Condition::Operational)
-                        {
-                            0
-                        } else {
-                            let x = table[cond_i - check][check_i - 1];
-                            let da_mod = da_comp[cond_i - check][check_i - 1];
-                            x - da_mod
-                        };
-                        match conds[cond_i - 1] {
-                            Condition::Operational => {
-                                table[cond_i][check_i] = op;
-                            }
-                            Condition::Damaged => {
-                                table[cond_i][check_i] = da;
-                                da_comp[cond_i][check_i] = da;
-                            }
-                            Condition::Unknown => {
-                                table[cond_i][check_i] = op + da;
-                                da_comp[cond_i][check_i] = da;
+
+                let op = table[cond_i - 1][check_i];
+                let is_blocked = conds[cond_i - check..cond_i].contains(&Condition::Operational);
+                let da = if check == 0 || is_blocked {
+                    0
+                } else {
+                    let target_cond = if cond_i == check {
+                        Condition::Operational
+                    } else {
+                        conds[cond_i - check - 1]
+                    };
+                    match target_cond {
+                        Condition::Operational | Condition::Unknown => {
+                            if cond_i == check {
+                                table[0][check_i - 1]
+                            } else {
+                                table[cond_i - check - 1][check_i - 1]
                             }
                         }
+                        Condition::Damaged => 0,
+                    }
+                };
+                match conds[cond_i - 1] {
+                    Condition::Operational => {
+                        table[cond_i][check_i] = op;
+                    }
+                    Condition::Damaged => {
+                        table[cond_i][check_i] = da;
+                    }
+                    Condition::Unknown => {
+                        table[cond_i][check_i] = op + da;
                     }
                 }
             }
