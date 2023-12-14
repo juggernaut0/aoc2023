@@ -1,6 +1,6 @@
 use crate::util::Point;
 use std::fmt::{Debug, Formatter};
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 use std::str::FromStr;
 
 pub struct Grid<T> {
@@ -26,18 +26,16 @@ impl<T> Grid<T> {
             .and_then(|row| row.get(p.0 as usize))
     }
 
+    pub fn get_mut(&mut self, p: Point) -> Option<&mut T> {
+        self.data
+            .get_mut(p.1 as usize)
+            .and_then(|row| row.get_mut(p.0 as usize))
+    }
+
     pub fn set(&mut self, p: Point, t: T) -> Option<T> {
-        let Point(x, y) = p;
-        if let Some(row) = self.data.get_mut(y as usize) {
-            if let Some(old) = row.get_mut(x as usize) {
-                let old = std::mem::replace(old, t);
-                Some(old)
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+        let elem = self.get_mut(p)?;
+        let old = std::mem::replace(elem, t);
+        Some(old)
     }
 
     pub fn points<'a>(&self) -> impl Iterator<Item = Point> + 'a {
@@ -84,6 +82,13 @@ impl<T> Index<Point> for Grid<T> {
 
     fn index(&self, index: Point) -> &Self::Output {
         self.get(index)
+            .unwrap_or_else(|| panic!("Cannot index grid: {index}"))
+    }
+}
+
+impl<T> IndexMut<Point> for Grid<T> {
+    fn index_mut(&mut self, index: Point) -> &mut Self::Output {
+        self.get_mut(index)
             .unwrap_or_else(|| panic!("Cannot index grid: {index}"))
     }
 }

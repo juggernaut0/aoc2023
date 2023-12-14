@@ -13,13 +13,13 @@ impl crate::Solution for Solution {
     fn solve_2(&self, input: String) -> String {
         let mut grid: Grid<Pipe> = input.parse().unwrap();
         let (loop_points, start_pos) = get_loop_points(&grid);
-        for p in grid.points().collect::<Vec<_>>() {
+        for p in grid.points() {
             if !loop_points.contains(&p) {
-                grid.set(p, Pipe::Ground);
+                grid[p] = Pipe::Ground;
             }
         }
         let start_pipe = Pipe::NE; // TODO generalize
-        grid.set(start_pos, start_pipe);
+        grid[start_pos] = start_pipe;
 
         let mut lefts = HashSet::new();
         let mut rights = HashSet::new();

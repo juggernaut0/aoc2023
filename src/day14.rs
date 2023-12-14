@@ -80,8 +80,8 @@ fn tilt(map: &mut Grid<Tile>, dir: Point) -> bool {
         if let Tile::Rock = map[p] {
             let to = p + dir;
             if let Some(Tile::Empty) = map.get(to) {
-                map.set(p, Tile::Empty);
-                map.set(to, Tile::Rock);
+                map[p] = Tile::Empty;
+                map[to] = Tile::Rock;
                 tilted = true;
             }
         }
