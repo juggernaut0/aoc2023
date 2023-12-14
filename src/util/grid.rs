@@ -40,9 +40,10 @@ impl<T> Grid<T> {
         }
     }
 
-    pub fn points(&self) -> impl Iterator<Item = Point> + '_ {
-        (0..self.data.len())
-            .flat_map(|y| (0..self.data[y].len()).map(move |x| Point(x as i32, y as i32)))
+    pub fn points<'a>(&self) -> impl Iterator<Item = Point> + 'a {
+        let height = self.data.len();
+        let width = self.data[0].len();
+        (0..height).flat_map(move |y| (0..width).map(move |x| Point(x as i32, y as i32)))
     }
 
     pub fn points_with_item(&self) -> impl Iterator<Item = (Point, &T)> {
