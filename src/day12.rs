@@ -106,33 +106,21 @@ impl Springs {
                 let is_blocked = conds[cond_i - check..cond_i].contains(&Condition::Operational);
                 let da = if check == 0 || is_blocked {
                     0
+                } else if cond_i == check {
+                    table[0][check_i - 1]
                 } else {
-                    let target_cond = if cond_i == check {
-                        Condition::Operational
-                    } else {
-                        conds[cond_i - check - 1]
-                    };
+                    let target_cond = conds[cond_i - check - 1];
                     match target_cond {
                         Condition::Operational | Condition::Unknown => {
-                            if cond_i == check {
-                                table[0][check_i - 1]
-                            } else {
-                                table[cond_i - check - 1][check_i - 1]
-                            }
+                            table[cond_i - check - 1][check_i - 1]
                         }
                         Condition::Damaged => 0,
                     }
                 };
-                match conds[cond_i - 1] {
-                    Condition::Operational => {
-                        table[cond_i][check_i] = op;
-                    }
-                    Condition::Damaged => {
-                        table[cond_i][check_i] = da;
-                    }
-                    Condition::Unknown => {
-                        table[cond_i][check_i] = op + da;
-                    }
+                table[cond_i][check_i] = match conds[cond_i - 1] {
+                    Condition::Operational => op,
+                    Condition::Damaged => da,
+                    Condition::Unknown => op + da,
                 }
             }
         }
