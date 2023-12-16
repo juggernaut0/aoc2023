@@ -108,15 +108,12 @@ impl Springs {
                     0
                 } else if cond_i == check {
                     table[0][check_i - 1]
+                } else if conds[cond_i - check - 1] == Condition::Damaged {
+                    0
                 } else {
-                    let target_cond = conds[cond_i - check - 1];
-                    match target_cond {
-                        Condition::Operational | Condition::Unknown => {
-                            table[cond_i - check - 1][check_i - 1]
-                        }
-                        Condition::Damaged => 0,
-                    }
+                    table[cond_i - check - 1][check_i - 1]
                 };
+
                 table[cond_i][check_i] = match conds[cond_i - 1] {
                     Condition::Operational => op,
                     Condition::Damaged => da,
