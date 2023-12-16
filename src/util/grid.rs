@@ -20,6 +20,14 @@ impl<T> Grid<T> {
         Grid { data }
     }
 
+    pub fn width(&self) -> usize {
+        self.data[0].len()
+    }
+
+    pub fn height(&self) -> usize {
+        self.data.len()
+    }
+
     pub fn get(&self, p: Point) -> Option<&T> {
         self.data
             .get(p.1 as usize)
