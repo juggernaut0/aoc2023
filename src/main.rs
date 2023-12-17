@@ -8,6 +8,8 @@ use clap::{Arg, Command};
 use log::Level;
 use std::time::Instant;
 
+#[cfg(test)]
+mod answers;
 mod day1;
 mod day10;
 mod day11;

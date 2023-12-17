@@ -66,10 +66,11 @@ fn find_last_digit(s: &str, re: &Regex) -> i32 {
 
 #[cfg(test)]
 mod test {
-    use crate::day1::Solution;
+    use super::*;
+    use crate::Solution;
+
     #[test]
     fn ex2() {
-        use crate::Solution;
         let inp = "two1nine
 eightwothree
 abcone2threexyz

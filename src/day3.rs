@@ -114,11 +114,11 @@ fn find_things(input: &str) -> (Vec<Number>, HashMap<Point, char>) {
 
 #[cfg(test)]
 mod test {
-    use crate::day3::Solution;
+    use super::*;
+    use crate::Solution;
 
     #[test]
     fn ex1() {
-        use crate::Solution;
         let inp = "467..114..
 ...*......
 ..35..633.

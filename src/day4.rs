@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-
 use crate::util::parse_lines;
 use std::collections::HashSet;
 use std::str::FromStr;
