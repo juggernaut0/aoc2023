@@ -14,6 +14,7 @@ macro_rules! answer_tests {
         paste! {
             #[test]
             fn [<day_ $day _part_1>]() {
+                $crate::init_test_logging();
                 let Some(expected) = read_answers($day, 0) else { return };
                 let input = $crate::read_input($day, "1");
                 let ans = $crate::[<day $day>]::Solution.solve_1(input);
@@ -22,6 +23,7 @@ macro_rules! answer_tests {
 
             #[test]
             fn [<day_ $day _part_2>]() {
+                $crate::init_test_logging();
                 let Some(expected) = read_answers($day, 1) else { return };
                 let input = $crate::read_input($day, "2");
                 let ans = $crate::[<day $day>]::Solution.solve_2(input);

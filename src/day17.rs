@@ -6,7 +6,7 @@ impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
         let city = City {
             map: input.parse().unwrap(),
-            min_straight: 0,
+            min_straight: 1,
             max_straight: 3,
         };
         let (best, _) = search(&city).unwrap();
@@ -40,33 +40,40 @@ struct State {
 }
 
 impl State {
-    fn next(&self, dir: Dir, city: &City) -> State {
-        let new_pos = self.key.pos + dir.diff();
-        let straights = if dir == self.key.dir {
-            self.key.straights + 1
-        } else {
-            1
-        };
+    fn turn_left(&self) -> State {
         State {
             key: StateKey {
-                pos: new_pos,
-                dir,
-                straights,
+                pos: self.key.pos,
+                dir: self.key.dir.turn_left(),
             },
-            total_cost: self.total_cost + city.map.get(new_pos).map_or(1000, |it| it.0 as i32),
+            total_cost: self.total_cost,
         }
     }
 
-    fn next_left(&self, city: &City) -> State {
-        self.next(self.key.dir.turn_left(), city)
+    fn turn_right(&self) -> State {
+        State {
+            key: StateKey {
+                pos: self.key.pos,
+                dir: self.key.dir.turn_right(),
+            },
+            total_cost: self.total_cost,
+        }
     }
 
-    fn next_right(&self, city: &City) -> State {
-        self.next(self.key.dir.turn_right(), city)
-    }
-
-    fn next_straight(&self, city: &City) -> State {
-        self.next(self.key.dir, city)
+    fn straight(&self, city: &City, n: u8) -> State {
+        let pos = self.key.pos + self.key.dir.diff();
+        let new_state = State {
+            key: StateKey {
+                pos,
+                dir: self.key.dir,
+            },
+            total_cost: self.total_cost + city.map.get(pos).map_or(10000, |it| it.0 as i32),
+        };
+        if n == 1 {
+            new_state
+        } else {
+            new_state.straight(city, n - 1)
+        }
     }
 }
 
@@ -74,7 +81,6 @@ impl State {
 struct StateKey {
     pos: Point,
     dir: Dir,
-    straights: u8,
 }
 
 struct City {
@@ -99,7 +105,6 @@ impl Searchable for City {
             key: StateKey {
                 pos: Point(0, 0),
                 dir: Dir::E,
-                straights: 0,
             },
             total_cost: 0,
         }
@@ -109,19 +114,21 @@ impl Searchable for City {
         let mut res = Vec::new();
 
         if state.total_cost == 0 {
-            // special condition for start: it can go right or straight
-            res.push(state.next_right(self));
-            res.push(state.next_straight(self));
+            // special condition for start: it can go east or south
+            res.push(state.straight(self, self.min_straight));
+            res.push(state.turn_right().straight(self, self.min_straight));
             return res;
         }
 
-        if state.key.straights >= self.min_straight {
-            res.push(state.next_left(self));
-            res.push(state.next_right(self));
-        }
-
-        if state.key.straights < self.max_straight {
-            res.push(state.next_straight(self));
+        let mut current = state;
+        for _ in self.min_straight..=self.max_straight {
+            if self.is_goal(&current) {
+                res.push(current);
+                break;
+            }
+            res.push(current.turn_left().straight(self, self.min_straight));
+            res.push(current.turn_right().straight(self, self.min_straight));
+            current = current.straight(self, 1);
         }
 
         res
@@ -140,7 +147,7 @@ impl Searchable for City {
     }
 
     fn is_goal(&self, state: &Self::State) -> bool {
-        state.key.pos == self.goal_point() && state.key.straights > self.min_straight
+        state.key.pos == self.goal_point()
     }
 
     fn break_on_goal() -> bool {

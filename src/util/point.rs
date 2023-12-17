@@ -1,5 +1,5 @@
 use std::fmt::{Debug, Display, Formatter};
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct Point(pub i32, pub i32);
@@ -41,6 +41,14 @@ impl Add for Point {
 
     fn add(self, rhs: Self) -> Self::Output {
         Point(self.0 + rhs.0, self.1 + rhs.1)
+    }
+}
+
+impl Mul<i32> for Point {
+    type Output = Self;
+
+    fn mul(self, rhs: i32) -> Self::Output {
+        Point(self.0 * rhs, self.1 * rhs)
     }
 }
 

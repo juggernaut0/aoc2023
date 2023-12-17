@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 // TODO fix casts
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_possible_wrap)]

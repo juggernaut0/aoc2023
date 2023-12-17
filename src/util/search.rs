@@ -96,15 +96,23 @@ pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
         seen.insert(key, value);
 
         for succ in search.successors(s) {
-            log::debug!("next {succ:?}");
             let succ_key = search.key(&succ);
             let succ_value_est = search.value_estimate(&succ);
-            let succ_item = KeyWithItem(succ_key, succ);
-            if let Some(old_prio) = q.get_priority(&succ_item) {
+            log::debug!("next {succ:?}, estimate {succ_value_est:?}");
+            let mut succ_item = KeyWithItem(succ_key, succ);
+            if let Some((a, old_prio)) = q.get_mut(&succ_item) {
+                if &succ_value_est > old_prio {
+                    std::mem::swap(a, &mut succ_item);
+                } else {
+                    continue;
+                }
+            }
+            /*if let Some(old_prio) = q.get_priority(&succ_item) {
                 if old_prio > &succ_value_est {
                     continue;
                 }
             }
+            q.remove(&succ_item);*/
             q.push(succ_item, succ_value_est);
         }
     }
