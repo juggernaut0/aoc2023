@@ -1,4 +1,4 @@
-use crate::util::{Grid, Point};
+use crate::util::{Dir, Grid, Point};
 use std::collections::HashSet;
 
 pub struct Solution;
@@ -43,25 +43,6 @@ impl From<char> for Tile {
             '-' => Tile::SplitterH,
             '|' => Tile::SplitterV,
             _ => Tile::Empty,
-        }
-    }
-}
-
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
-enum Dir {
-    N,
-    E,
-    S,
-    W,
-}
-
-impl Dir {
-    fn diff(&self) -> Point {
-        match self {
-            Dir::N => Point(0, -1),
-            Dir::E => Point(1, 0),
-            Dir::S => Point(0, 1),
-            Dir::W => Point(-1, 0),
         }
     }
 }

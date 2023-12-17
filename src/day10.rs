@@ -1,4 +1,4 @@
-use crate::util::{Grid, Point};
+use crate::util::{Dir, Grid, Point};
 use std::collections::HashSet;
 
 pub struct Solution;
@@ -103,10 +103,10 @@ impl Pipe {
     }
 
     fn left_right(self, p: Point, from: Dir) -> (Vec<Point>, Vec<Point>) {
-        let n = p + Point(0, -1);
-        let e = p + Point(1, 0);
-        let s = p + Point(0, 1);
-        let w = p + Point(-1, 0);
+        let n = p + Dir::N.diff();
+        let e = p + Dir::E.diff();
+        let s = p + Dir::S.diff();
+        let w = p + Dir::W.diff();
         match (self, from) {
             (Pipe::NS, Dir::N) => (vec![e], vec![w]),
             (Pipe::NS, Dir::S) => (vec![w], vec![e]),
@@ -125,10 +125,10 @@ impl Pipe {
     }
 
     fn go(self, p: Point, from: Dir) -> (Point, Dir) {
-        let n = (p + Point(0, -1), Dir::S);
-        let e = (p + Point(1, 0), Dir::W);
-        let s = (p + Point(0, 1), Dir::N);
-        let w = (p + Point(-1, 0), Dir::E);
+        let n = (p + Dir::N.diff(), Dir::S);
+        let e = (p + Dir::E.diff(), Dir::W);
+        let s = (p + Dir::S.diff(), Dir::N);
+        let w = (p + Dir::W.diff(), Dir::E);
         match (self, from) {
             (Pipe::NS, Dir::N) => s,
             (Pipe::NS, Dir::S) => n,
@@ -162,14 +162,6 @@ impl From<char> for Pipe {
             _ => panic!("{value}"),
         }
     }
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-enum Dir {
-    N,
-    E,
-    S,
-    W,
 }
 
 fn flood(grid: &Grid<Pipe>, start: Vec<Point>, flooded: &mut HashSet<Point>) {

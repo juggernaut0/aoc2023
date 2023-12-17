@@ -1,4 +1,4 @@
-use crate::util::{search, Grid, Point, Searchable};
+use crate::util::{search, Grid, Point, Searchable, Dir};
 
 pub struct Solution;
 
@@ -33,43 +33,6 @@ impl From<char> for Cost {
     }
 }
 
-#[derive(Copy, Clone, Hash, Eq, PartialEq, Debug)]
-enum Dir {
-    N,
-    E,
-    S,
-    W,
-}
-
-impl Dir {
-    fn left(&self) -> Dir {
-        match self {
-            Dir::N => Dir::W,
-            Dir::E => Dir::N,
-            Dir::S => Dir::E,
-            Dir::W => Dir::S,
-        }
-    }
-
-    fn right(&self) -> Dir {
-        match self {
-            Dir::N => Dir::E,
-            Dir::E => Dir::S,
-            Dir::S => Dir::W,
-            Dir::W => Dir::N,
-        }
-    }
-
-    fn diff(&self) -> Point {
-        match self {
-            Dir::N => Point(0, -1),
-            Dir::E => Point(1, 0),
-            Dir::S => Point(0, 1),
-            Dir::W => Point(-1, 0),
-        }
-    }
-}
-
 #[derive(Debug)]
 struct State {
     key: StateKey,
@@ -96,11 +59,11 @@ impl State {
     }
 
     fn next_left(&self, city: &City) -> State {
-        self.next(self.key.dir.left(), city)
+        self.next(self.key.dir.turn_left(), city)
     }
 
     fn next_right(&self, city: &City) -> State {
-        self.next(self.key.dir.right(), city)
+        self.next(self.key.dir.turn_right(), city)
     }
 
     fn next_straight(&self, city: &City) -> State {

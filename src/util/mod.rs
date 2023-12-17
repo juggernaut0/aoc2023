@@ -3,7 +3,9 @@ mod counter;
 mod grid;
 mod point;
 mod search;
+mod dir;
 
+pub use dir::*;
 pub use counter::*;
 pub use grid::*;
 pub use point::*;
