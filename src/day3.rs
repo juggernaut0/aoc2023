@@ -30,12 +30,12 @@ impl crate::Solution for Solution {
                             .any(|np| adj_points.iter().any(|ap| ap == &np))
                     })
                     .collect();
-                if adj.len() != 2 {
-                    0
-                } else {
+                if adj.len() == 2 {
                     let a = adj[0];
                     let b = adj[1];
                     a.value_as_i32() * b.value_as_i32()
+                } else {
+                    0
                 }
             })
             .sum::<i32>()
@@ -99,11 +99,10 @@ fn find_things(input: &str) -> (Vec<Number>, HashMap<Point, char>) {
                     numbers.push(n);
                     number = None;
                 }
-                if c != '.' {
-                    symbols.insert(pos, c);
-                } else {
+                if c == '.' {
                     continue;
                 }
+                symbols.insert(pos, c);
             }
         }
         if let Some(n) = number {

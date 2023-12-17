@@ -6,13 +6,13 @@ pub struct Solution;
 
 impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
-        process(input, Regex::new("\\d").unwrap())
+        process(&input, &Regex::new("\\d").unwrap())
     }
 
     fn solve_2(&self, input: String) -> String {
         process(
-            input,
-            Regex::new("\\d|one|two|three|four|five|six|seven|eight|nine").unwrap(),
+            &input,
+            &Regex::new("\\d|one|two|three|four|five|six|seven|eight|nine").unwrap(),
         )
     }
 }
@@ -31,10 +31,10 @@ static NUMS: Lazy<HashMap<String, i32>> = Lazy::new(|| {
     nums
 });
 
-fn process(input: String, re: Regex) -> String {
+fn process(input: &str, re: &Regex) -> String {
     input
         .lines()
-        .map(|line| process_line(line, &re))
+        .map(|line| process_line(line, re))
         .sum::<i32>()
         .to_string()
 }

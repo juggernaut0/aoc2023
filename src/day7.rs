@@ -90,7 +90,7 @@ impl Hand {
             match self.cards[i].cmp(&9) {
                 Ordering::Less => self.cards[i] += 1,
                 Ordering::Equal => self.cards[i] = 0,
-                _ => {}
+                Ordering::Greater => {}
             }
         }
     }
@@ -152,10 +152,10 @@ impl Ord for Hand {
         }
 
         let type_cmp = self.get_type().cmp(&other.get_type());
-        if type_cmp != Ordering::Equal {
-            type_cmp
-        } else {
+        if type_cmp == Ordering::Equal {
             self.cards.cmp(&other.cards)
+        } else {
+            type_cmp
         }
     }
 }

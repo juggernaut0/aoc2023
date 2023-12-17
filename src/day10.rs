@@ -66,11 +66,10 @@ fn get_loop_points(grid: &Grid<Pipe>) -> (HashSet<Point>, Point) {
         for a in pipe.adj(this) {
             if res.contains(&a) {
                 continue;
-            } else {
-                res.insert(this);
-                this = a;
-                break;
             }
+            res.insert(this);
+            this = a;
+            break;
         }
     }
     res.insert(last);
@@ -102,6 +101,7 @@ impl Pipe {
         }
     }
 
+    #[allow(clippy::many_single_char_names)]
     fn left_right(self, p: Point, from: Dir) -> (Vec<Point>, Vec<Point>) {
         let n = p + Dir::N.diff();
         let e = p + Dir::E.diff();
@@ -124,6 +124,8 @@ impl Pipe {
         }
     }
 
+    #[allow(clippy::many_single_char_names)]
+    #[allow(clippy::match_same_arms)]
     fn go(self, p: Point, from: Dir) -> (Point, Dir) {
         let n = (p + Dir::N.diff(), Dir::S);
         let e = (p + Dir::E.diff(), Dir::W);
@@ -149,16 +151,15 @@ impl Pipe {
 
 impl From<char> for Pipe {
     fn from(value: char) -> Self {
-        use Pipe::*;
         match value {
-            '|' => NS,
-            '-' => EW,
-            'L' => NE,
-            'J' => NW,
-            'F' => SE,
-            '7' => SW,
-            '.' => Ground,
-            'S' => Start,
+            '|' => Pipe::NS,
+            '-' => Pipe::EW,
+            'L' => Pipe::NE,
+            'J' => Pipe::NW,
+            'F' => Pipe::SE,
+            '7' => Pipe::SW,
+            '.' => Pipe::Ground,
+            'S' => Pipe::Start,
             _ => panic!("{value}"),
         }
     }

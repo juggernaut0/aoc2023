@@ -28,6 +28,7 @@ fn parse_value_seq(line: &str) -> Vec<i32> {
         .collect()
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn predict_value(seq: Vec<i32>) -> i32 {
     if seq.iter().copied().all(|v| v == 0) {
         return 0;

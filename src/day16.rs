@@ -6,7 +6,7 @@ pub struct Solution;
 impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
         let map = input.parse().unwrap();
-        energy(trace_light(&map, Point(0, 0), Dir::E)).to_string()
+        energy(&trace_light(&map, Point(0, 0), Dir::E)).to_string()
     }
 
     fn solve_2(&self, input: String) -> String {
@@ -20,7 +20,7 @@ impl crate::Solution for Solution {
         top.chain(bot)
             .chain(lft)
             .chain(rgt)
-            .map(|(start_pos, start_dir)| energy(trace_light(&map, start_pos, start_dir)))
+            .map(|(start_pos, start_dir)| energy(&trace_light(&map, start_pos, start_dir)))
             .max()
             .unwrap()
             .to_string()
@@ -104,7 +104,7 @@ fn trace_light(map: &Grid<Tile>, start_pos: Point, start_dir: Dir) -> Grid<HashS
     trace
 }
 
-fn energy(trace: Grid<HashSet<Dir>>) -> usize {
+fn energy(trace: &Grid<HashSet<Dir>>) -> usize {
     trace
         .points_with_item()
         .filter(|(_, set)| !set.is_empty())

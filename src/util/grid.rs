@@ -29,15 +29,15 @@ impl<T> Grid<T> {
     }
 
     pub fn get(&self, p: Point) -> Option<&T> {
-        self.data
-            .get(p.1 as usize)
-            .and_then(|row| row.get(p.0 as usize))
+        let x: usize = p.0.try_into().ok()?;
+        let y: usize = p.1.try_into().ok()?;
+        self.data.get(y).and_then(|row| row.get(x))
     }
 
     pub fn get_mut(&mut self, p: Point) -> Option<&mut T> {
-        self.data
-            .get_mut(p.1 as usize)
-            .and_then(|row| row.get_mut(p.0 as usize))
+        let x: usize = p.0.try_into().ok()?;
+        let y: usize = p.1.try_into().ok()?;
+        self.data.get_mut(y).and_then(|row| row.get_mut(x))
     }
 
     pub fn set(&mut self, p: Point, t: T) -> Option<T> {
@@ -67,7 +67,7 @@ impl<T: From<char>> FromStr for Grid<T> {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let data = s
             .lines()
-            .map(|line| line.chars().map(|c| c.into()).collect())
+            .map(|line| line.chars().map(char::into).collect())
             .collect();
         Ok(Grid { data })
     }

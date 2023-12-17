@@ -5,16 +5,16 @@ pub struct Solution;
 
 impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
-        solve(input, 0)
+        solve(&input, 0)
     }
 
     fn solve_2(&self, input: String) -> String {
-        solve(input, 1)
+        solve(&input, 1)
     }
 }
 
-fn solve(input: String, target_diff: usize) -> String {
-    parse_input(&input)
+fn solve(input: &str, target_diff: usize) -> String {
+    parse_input(input)
         .map(|ps| {
             let (orient, val) = find_mirror(&ps, target_diff);
             match orient {

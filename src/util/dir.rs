@@ -9,7 +9,7 @@ pub enum Dir {
 }
 
 impl Dir {
-    pub fn turn_left(&self) -> Dir {
+    pub fn turn_left(self) -> Dir {
         match self {
             Dir::N => Dir::W,
             Dir::E => Dir::N,
@@ -18,7 +18,7 @@ impl Dir {
         }
     }
 
-    pub fn turn_right(&self) -> Dir {
+    pub fn turn_right(self) -> Dir {
         match self {
             Dir::N => Dir::E,
             Dir::E => Dir::S,
@@ -27,7 +27,7 @@ impl Dir {
         }
     }
 
-    pub fn diff(&self) -> Point {
+    pub fn diff(self) -> Point {
         match self {
             Dir::N => Point(0, -1),
             Dir::E => Point(1, 0),

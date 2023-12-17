@@ -35,11 +35,10 @@ pub fn gcd(mut a: u64, mut b: u64) -> u64 {
     loop {
         if b == 0 {
             return a;
-        } else {
-            let t = a % b;
-            a = b;
-            b = t;
         }
+        let t = a % b;
+        a = b;
+        b = t;
     }
 }
 

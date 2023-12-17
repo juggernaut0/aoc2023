@@ -22,7 +22,7 @@ pub trait Searchable: Sized {
     fn is_goal(&self, state: &Self::State) -> bool;
 
     /**
-    return true if the value_estimate is such that the first goal state reached is guaranteed to be
+    return true if the `value_estimate` is such that the first goal state reached is guaranteed to be
     optimal.
     */
     fn break_on_goal() -> bool {
@@ -34,7 +34,7 @@ struct KeyWithItem<S: Searchable>(S::Key, S::State);
 
 impl<S: Searchable> Hash for KeyWithItem<S> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.hash(state)
+        self.0.hash(state);
     }
 }
 
@@ -46,7 +46,7 @@ impl<S: Searchable> PartialEq for KeyWithItem<S> {
 
 impl<S: Searchable> Eq for KeyWithItem<S> {}
 
-pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
+pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
     let initial_state = search.initial_state();
     let break_on_goal = S::break_on_goal();
     let mut q = PriorityQueue::new();
@@ -88,9 +88,8 @@ pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
                 best = Some((s, value));
                 if break_on_goal {
                     break;
-                } else {
-                    continue;
                 }
+                continue;
             }
         }
 

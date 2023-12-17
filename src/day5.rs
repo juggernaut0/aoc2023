@@ -5,7 +5,7 @@ pub struct Solution;
 
 impl crate::Solution for Solution {
     fn solve_1(&self, input: String) -> String {
-        let (seeds, maps) = parse_input(input);
+        let (seeds, maps) = parse_input(&input);
         seeds
             .into_iter()
             .map(|seed| maps.iter().fold(seed, |n, map| map.apply(n)))
@@ -15,7 +15,7 @@ impl crate::Solution for Solution {
     }
 
     fn solve_2(&self, input: String) -> String {
-        let (seeds, maps) = parse_input(input);
+        let (seeds, maps) = parse_input(&input);
         let maps: Vec<_> = maps.into_iter().map(RefCell::new).collect();
 
         let seed_map_entries = seeds
@@ -85,7 +85,7 @@ impl Map {
                     new_entries.push(MapEntry {
                         source: last..e.source.start,
                         dest_start: last,
-                    })
+                    });
                 }
             }
             last = Some(e.source.end);
@@ -99,7 +99,7 @@ impl Map {
     }
 }
 
-fn parse_input(input: String) -> (Vec<u64>, Vec<Map>) {
+fn parse_input(input: &str) -> (Vec<u64>, Vec<Map>) {
     let mut lines = input.lines();
     let seeds_str = &lines.next().unwrap()[7..];
     let seeds = seeds_str

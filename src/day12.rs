@@ -15,7 +15,7 @@ impl crate::Solution for Solution {
 
     fn solve_2(&self, input: String) -> String {
         parse_lines::<Springs>(&input)
-            .update(|springs| springs.expand())
+            .update(Springs::expand)
             .map(|springs| springs.possibilities())
             .sum::<u64>()
             .to_string()
@@ -89,6 +89,7 @@ impl Springs {
         }
     }
 
+    #[allow(clippy::match_on_vec_items)] // false positive
     fn possibilities(&self) -> u64 {
         let conds = &self.conditions;
         let checks = &self.checks;

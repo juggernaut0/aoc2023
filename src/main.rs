@@ -1,3 +1,9 @@
+// TODO fix casts
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_possible_wrap)]
+#![allow(clippy::cast_lossless)]
+#![allow(clippy::cast_sign_loss)]
+
 use clap::{Arg, Command};
 use log::Level;
 use std::time::Instant;
@@ -70,6 +76,7 @@ fn main() {
             Arg::new("log_level")
                 .long("level")
                 .help("Logging level")
+                .value_parser(["trace", "debug", "info", "warn", "error"])
                 .default_value("warn"),
         )
         .get_matches();
@@ -84,17 +91,17 @@ fn main() {
         "info" => Level::Info,
         "warn" => Level::Warn,
         "error" => Level::Error,
-        _ => Level::Warn,
+        _ => unreachable!(),
     };
 
     simple_logger::init_with_level(log_level).unwrap();
 
     let day: usize = matches.get_one("day").map(|it: &u32| *it as usize).unwrap();
-    let puzzle: Option<&String> = matches.get_one("puzzle");
+    let puzzle = matches.get_one("puzzle").map(String::as_str);
 
     let solution = DAYS[day - 1];
 
-    let (answer, time) = match puzzle.map(|it| it.as_str()) {
+    let (answer, time) = match puzzle {
         Some("1") => {
             let input = read_input(day, "1");
             time(|| solution.solve_1(input))
@@ -117,12 +124,12 @@ fn main() {
 }
 
 fn read_input(day: usize, puzzle: &str) -> String {
-    let dss = format!("input/{}-{}.txt", day, puzzle);
+    let dss = format!("input/{day}-{puzzle}.txt");
     let ds = std::path::Path::new(&dss);
     if ds.exists() {
         std::fs::read_to_string(ds).unwrap()
     } else {
-        std::fs::read_to_string(format!("input/{}.txt", day)).unwrap()
+        std::fs::read_to_string(format!("input/{day}.txt")).unwrap()
     }
 }
 

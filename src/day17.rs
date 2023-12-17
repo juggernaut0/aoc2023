@@ -9,7 +9,7 @@ impl crate::Solution for Solution {
             min_straight: 0,
             max_straight: 3,
         };
-        let (best, _) = search(city).unwrap();
+        let (best, _) = search(&city).unwrap();
         best.total_cost.to_string()
     }
 
@@ -19,7 +19,7 @@ impl crate::Solution for Solution {
             min_straight: 4,
             max_straight: 10,
         };
-        let (best, _) = search(city).unwrap();
+        let (best, _) = search(&city).unwrap();
         best.total_cost.to_string()
     }
 }
@@ -53,8 +53,7 @@ impl State {
                 dir,
                 straights,
             },
-            total_cost: self.total_cost
-                + city.map.get(new_pos).map(|it| it.0 as i32).unwrap_or(10000),
+            total_cost: self.total_cost + city.map.get(new_pos).map_or(1000, |it| it.0 as i32),
         }
     }
 
