@@ -7,7 +7,7 @@ use std::hash::{Hash, Hasher};
 Represents a searchable world
 */
 pub trait Searchable: Sized {
-    type State;
+    type State: Debug;
     type Key: Hash + Eq;
     type Value: Ord + Debug;
 
@@ -62,6 +62,8 @@ pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
     while !q.is_empty() {
         let (KeyWithItem(key, s), value_est) = q.pop().unwrap();
 
+        log::debug!("checking {s:?}, estimate {value_est:?}");
+
         if let Some((_, best_v)) = best.as_ref() {
             if &value_est <= best_v {
                 continue;
@@ -95,9 +97,16 @@ pub fn search<S: Searchable>(search: S) -> Option<(S::State, S::Value)> {
         seen.insert(key, value);
 
         for succ in search.successors(s) {
+            log::debug!("next {succ:?}");
             let succ_key = search.key(&succ);
             let succ_value_est = search.value_estimate(&succ);
-            q.push(KeyWithItem(succ_key, succ), succ_value_est);
+            let succ_item = KeyWithItem(succ_key, succ);
+            if let Some(old_prio) = q.get_priority(&succ_item) {
+                if old_prio > &succ_value_est {
+                    continue;
+                }
+            }
+            q.push(succ_item, succ_value_est);
         }
     }
 
