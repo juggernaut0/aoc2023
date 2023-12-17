@@ -1,4 +1,4 @@
-use crate::util::{search, Grid, Point, Searchable, Dir};
+use crate::util::{search, Dir, Grid, Point, Searchable};
 
 pub struct Solution;
 

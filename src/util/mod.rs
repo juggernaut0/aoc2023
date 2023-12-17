@@ -1,12 +1,12 @@
 #![allow(dead_code)]
 mod counter;
+mod dir;
 mod grid;
 mod point;
 mod search;
-mod dir;
 
-pub use dir::*;
 pub use counter::*;
+pub use dir::*;
 pub use grid::*;
 pub use point::*;
 pub use search::*;
