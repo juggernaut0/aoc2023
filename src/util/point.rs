@@ -5,7 +5,7 @@ use std::ops::{Add, Mul};
 pub struct Point(pub i32, pub i32);
 
 impl Point {
-    fn zero() -> Point {
+    pub fn zero() -> Point {
         Point(0, 0)
     }
 
@@ -57,6 +57,14 @@ impl Mul<i32> for Point {
 
     fn mul(self, rhs: i32) -> Self::Output {
         Point(self.0 * rhs, self.1 * rhs)
+    }
+}
+
+impl Mul<Point> for i32 {
+    type Output = Point;
+
+    fn mul(self, rhs: Point) -> Self::Output {
+        rhs * self
     }
 }
 
