@@ -52,13 +52,7 @@ impl From<char> for Tile {
 
 fn load(map: &Grid<Tile>) -> i32 {
     map.points_with_item()
-        .map(|(p, t)| {
-            if let Tile::Rock = t {
-                100 - p.1
-            } else {
-                0
-            }
-        })
+        .map(|(p, t)| if let Tile::Rock = t { 100 - p.1 } else { 0 })
         .sum()
 }
 

@@ -9,7 +9,11 @@ impl Point {
         Point(0, 0)
     }
 
-    pub fn of<X: TryInto<i32>, Y: TryInto<i32>>(x: X, y: Y) -> Point where X::Error: Debug, Y::Error: Debug {
+    pub fn of<X: TryInto<i32>, Y: TryInto<i32>>(x: X, y: Y) -> Point
+    where
+        X::Error: Debug,
+        Y::Error: Debug,
+    {
         Point(x.try_into().unwrap(), y.try_into().unwrap())
     }
 
