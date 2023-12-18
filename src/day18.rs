@@ -10,7 +10,7 @@ impl crate::Solution for Solution {
     }
 
     fn solve_2(&self, input: String) -> String {
-        find_area(parse_lines(&input).update(Instruction::fix_dists)).to_string()
+        find_area(parse_lines(&input).update(Instruction::fix)).to_string()
     }
 }
 
@@ -21,7 +21,7 @@ struct Instruction {
 }
 
 impl Instruction {
-    fn fix_dists(&mut self) {
+    fn fix(&mut self) {
         self.dist = self.color.0;
         self.dir = self.color.1;
     }
@@ -82,46 +82,26 @@ fn find_border(instructions: impl Iterator<Item = Instruction>) -> Vec<Segment> 
 fn find_area(instructions: impl Iterator<Item = Instruction>) -> i64 {
     let border = find_border(instructions);
 
-    let (min_x, max_x) = border
-        .iter()
-        .flat_map(|seg| [seg.start.0, seg.end.0])
-        .minmax()
-        .into_option()
-        .unwrap();
-    let (min_y, max_y) = border
-        .iter()
-        .flat_map(|seg| [seg.start.1, seg.end.1])
-        .minmax()
-        .into_option()
-        .unwrap();
-    let center = Point((min_x + max_x) / 2, (min_y + max_y) / 2);
-
     let mut area = 0;
     let mut border_area = 0; // only counts bottom and left borders
     for seg in border {
         let (base, height) = if seg.start.0 == seg.end.0 {
-            (
-                i64::from(seg.start.1 - seg.end.1),
-                i64::from(center.0 - seg.start.0),
-            )
+            (i64::from(seg.start.1 - seg.end.1), i64::from(-seg.start.0))
         } else {
-            (
-                i64::from(seg.start.0 - seg.end.0),
-                i64::from(seg.start.1 - center.1),
-            )
+            (i64::from(seg.start.0 - seg.end.0), i64::from(seg.start.1))
         };
         log::debug!("base {base} height {height}");
         area += base * height;
 
-        if seg.start.0 == seg.end.0 && seg.start.1 > seg.end.1 {
+        if seg.start.1 > seg.end.1 {
             // left border
             border_area += i64::from(seg.start.1 - seg.end.1);
-        } else if seg.start.1 == seg.end.1 && seg.start.0 > seg.end.0 {
+        } else if seg.start.0 > seg.end.0 {
             // bottom border
             border_area += i64::from(seg.start.0 - seg.end.0);
         }
     }
 
-    // the 1 is for the center I think
+    // not sure where the 1 comes from
     area / 2 + border_area + 1
 }
