@@ -107,12 +107,6 @@ pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
                     continue;
                 }
             }
-            /*if let Some(old_prio) = q.get_priority(&succ_item) {
-                if old_prio > &succ_value_est {
-                    continue;
-                }
-            }
-            q.remove(&succ_item);*/
             q.push(succ_item, succ_value_est);
         }
     }

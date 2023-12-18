@@ -12,7 +12,7 @@ impl crate::Solution for Solution {
 
     fn solve_2(&self, input: String) -> String {
         let mut map: Grid<Tile> = input.parse().unwrap();
-        let mut seen: HashMap<u32, u32> = HashMap::new();
+        let mut seen = HashMap::new();
         let mut cycle_start = 0;
         let mut cycle_length = 0;
         for i in 1.. {
@@ -50,11 +50,11 @@ impl From<char> for Tile {
     }
 }
 
-fn load(map: &Grid<Tile>) -> u32 {
+fn load(map: &Grid<Tile>) -> i32 {
     map.points_with_item()
         .map(|(p, t)| {
             if let Tile::Rock = t {
-                100 - (p.1 as u32)
+                100 - p.1
             } else {
                 0
             }
@@ -62,11 +62,11 @@ fn load(map: &Grid<Tile>) -> u32 {
         .sum()
 }
 
-fn key(map: &Grid<Tile>) -> u32 {
+fn key(map: &Grid<Tile>) -> i32 {
     map.points_with_item()
         .map(|(p, t)| {
             if let Tile::Rock = t {
-                (p.0 + 1000 * p.1) as u32
+                p.0 + 1000 * p.1
             } else {
                 0
             }

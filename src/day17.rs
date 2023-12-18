@@ -29,7 +29,9 @@ struct Cost(u8);
 
 impl From<char> for Cost {
     fn from(value: char) -> Self {
-        Cost(value.to_digit(10).unwrap() as u8)
+        let mut buf = [0u8; 1];
+        let s = value.encode_utf8(&mut buf);
+        Cost(s.parse().unwrap())
     }
 }
 
@@ -67,7 +69,7 @@ impl State {
                 pos,
                 dir: self.key.dir,
             },
-            total_cost: self.total_cost + city.map.get(pos).map_or(10000, |it| it.0 as i32),
+            total_cost: self.total_cost + city.map.get(pos).map_or(10000, |it| i32::from(it.0)),
         };
         if n == 1 {
             new_state
@@ -91,7 +93,7 @@ struct City {
 
 impl City {
     fn goal_point(&self) -> Point {
-        Point(self.map.width() as i32 - 1, self.map.height() as i32 - 1)
+        Point(self.map.width() - 1, self.map.height() - 1)
     }
 }
 

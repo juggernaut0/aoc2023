@@ -8,24 +8,26 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
-    pub fn build(width: usize, height: usize, elem: impl Fn(Point) -> T) -> Grid<T> {
-        let mut data = Vec::with_capacity(height);
+    pub fn build(width: i32, height: i32, elem: impl Fn(Point) -> T) -> Grid<T> {
+        let width_size = width.try_into().unwrap();
+        let height_size = height.try_into().unwrap();
+        let mut data = Vec::with_capacity(height_size);
         for y in 0..height {
-            let mut row = Vec::with_capacity(width);
+            let mut row = Vec::with_capacity(width_size);
             for x in 0..width {
-                row.push(elem(Point(x as i32, y as i32)));
+                row.push(elem(Point(x, y)));
             }
             data.push(row);
         }
         Grid { data }
     }
 
-    pub fn width(&self) -> usize {
-        self.data[0].len()
+    pub fn width(&self) -> i32 {
+        self.data[0].len().try_into().unwrap()
     }
 
-    pub fn height(&self) -> usize {
-        self.data.len()
+    pub fn height(&self) -> i32 {
+        self.data.len().try_into().unwrap()
     }
 
     pub fn get(&self, p: Point) -> Option<&T> {
@@ -47,17 +49,13 @@ impl<T> Grid<T> {
     }
 
     pub fn points<'a>(&self) -> impl Iterator<Item = Point> + 'a {
-        let height = self.data.len();
-        let width = self.data[0].len();
-        (0..height).flat_map(move |y| (0..width).map(move |x| Point(x as i32, y as i32)))
+        let height: i32 = self.data.len().try_into().expect("my height is too big");
+        let width: i32 = self.data[0].len().try_into().expect("my width is too big");
+        (0..height).flat_map(move |y| (0..width).map(move |x| Point(x, y)))
     }
 
     pub fn points_with_item(&self) -> impl Iterator<Item = (Point, &T)> {
-        self.data.iter().enumerate().flat_map(|(y, row)| {
-            row.iter()
-                .enumerate()
-                .map(move |(x, t)| (Point(x as i32, y as i32), t))
-        })
+        self.points().map(|p| (p, &self[p]))
     }
 }
 

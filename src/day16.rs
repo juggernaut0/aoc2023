@@ -13,10 +13,10 @@ impl crate::Solution for Solution {
         let map: Grid<Tile> = input.parse().unwrap();
         let w = map.width();
         let h = map.height();
-        let top = (0..w).map(|x| (Point(x as i32, 0), Dir::S));
-        let bot = (0..w).map(|x| (Point(x as i32, (h as i32) - 1), Dir::N));
-        let lft = (0..h).map(|y| (Point(0, y as i32), Dir::E));
-        let rgt = (0..h).map(|y| (Point((h as i32) - 1, y as i32), Dir::W));
+        let top = (0..w).map(|x| (Point(x, 0), Dir::S));
+        let bot = (0..w).map(|x| (Point(x, (h) - 1), Dir::N));
+        let lft = (0..h).map(|y| (Point(0, y), Dir::E));
+        let rgt = (0..h).map(|y| (Point((h) - 1, y), Dir::W));
         top.chain(bot)
             .chain(lft)
             .chain(rgt)

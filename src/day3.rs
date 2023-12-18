@@ -55,7 +55,7 @@ impl Number {
     }
 
     fn neighbors(&self) -> Vec<Point> {
-        let l = self.value.len() as i32;
+        let l: i32 = self.value.len().try_into().unwrap();
         let mut res = vec![
             self.pos + Point(-1, -1),
             self.pos + Point(-1, 0),
@@ -72,7 +72,8 @@ impl Number {
     }
 
     fn occupied_points(&self) -> impl Iterator<Item = Point> + '_ {
-        (0..self.value.len()).map(|dx| self.pos + Point(dx as i32, 0))
+        let len = self.value.len().try_into().unwrap();
+        (0..len).map(|dx| self.pos + Point(dx, 0))
     }
 }
 
@@ -82,7 +83,7 @@ fn find_things(input: &str) -> (Vec<Number>, HashMap<Point, char>) {
     for (y, line) in input.lines().enumerate() {
         let mut number: Option<Number> = None;
         for (x, c) in line.char_indices() {
-            let pos = Point(x as i32, y as i32);
+            let pos = Point::of(x, y);
             if c.is_ascii_digit() {
                 if let Some(n) = number.as_mut() {
                     n.value.push(c);

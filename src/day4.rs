@@ -42,7 +42,7 @@ impl Card {
     }
 
     fn points(&self) -> i32 {
-        let exp = self.matches() as u32;
+        let exp: u32 = self.matches().try_into().unwrap();
         if exp == 0 {
             0
         } else {

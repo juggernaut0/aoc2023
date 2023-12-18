@@ -6,16 +6,16 @@ impl crate::Solution for Solution {
             .into_iter()
             .map(|race| {
                 let h = hold_time(race);
-                (race.0 - 2 * h + 1) as i64
+                race.0 - 2 * h + 1
             })
-            .product::<i64>()
+            .product::<i32>()
             .to_string()
     }
 
     fn solve_2(&self, input: String) -> String {
         let race = parse_input_2(&input);
         let h = hold_time_2(race);
-        let ways = (race.0 - 2 * h + 1) as i64;
+        let ways = race.0 - 2 * h + 1;
         ways.to_string()
     }
 }

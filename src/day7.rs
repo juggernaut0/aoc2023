@@ -26,7 +26,7 @@ fn sum_winnings(hands: Vec<HandBid>) -> String {
         .into_iter()
         .enumerate()
         .map(|(i, hb)| {
-            let rank = (i + 1) as u32;
+            let rank: u32 = (i + 1).try_into().unwrap();
             rank * hb.bid
         })
         .sum::<u32>()

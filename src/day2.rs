@@ -24,7 +24,7 @@ impl crate::Solution for Solution {
                     .fold(Pick::default(), |a, b| a.min_colors(&b))
                     .power()
             })
-            .sum::<i64>()
+            .sum::<i32>()
             .to_string()
     }
 }
@@ -50,8 +50,8 @@ impl Pick {
         }
     }
 
-    fn power(&self) -> i64 {
-        self.red as i64 * self.green as i64 * self.blue as i64
+    fn power(&self) -> i32 {
+        self.red * self.green * self.blue
     }
 }
 

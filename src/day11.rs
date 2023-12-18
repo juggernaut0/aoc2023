@@ -21,7 +21,7 @@ impl crate::Solution for Solution {
         galaxies
             .into_iter()
             .combinations(2)
-            .map(|c| c[0].l1dist(c[1]) as i64)
+            .map(|c| i64::from(c[0].l1dist(c[1])))
             .sum::<i64>()
             .to_string()
     }
@@ -32,7 +32,7 @@ fn parse_input(input: &str) -> Vec<Point> {
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
             if c == '#' {
-                res.push(Point(x as i32, y as i32));
+                res.push(Point::of(x, y));
             }
         }
     }
