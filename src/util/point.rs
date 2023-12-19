@@ -2,13 +2,9 @@ use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, Mul};
 
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
-pub struct Point(pub i32, pub i32);
+pub struct Point<T = i32>(pub T, pub T);
 
 impl Point {
-    pub fn zero() -> Point {
-        Point(0, 0)
-    }
-
     pub fn of<X: TryInto<i32>, Y: TryInto<i32>>(x: X, y: Y) -> Point
     where
         X::Error: Debug,
@@ -44,7 +40,20 @@ impl Point {
     }
 }
 
-impl Add for Point {
+impl<T> Point<T> {
+    // pseudo Into impl
+    pub fn into<U: From<T>>(self) -> Point<U> {
+        Point(self.0.into(), self.1.into())
+    }
+}
+
+impl<T: Default> Point<T> {
+    pub fn zero() -> Self {
+        Point(T::default(), T::default())
+    }
+}
+
+impl<T: Add<Output = T>> Add for Point<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -52,30 +61,21 @@ impl Add for Point {
     }
 }
 
-impl Mul<i32> for Point {
+impl<T: Mul<Output = T> + Copy> Mul<T> for Point<T> {
     type Output = Self;
 
-    fn mul(self, rhs: i32) -> Self::Output {
+    fn mul(self, rhs: T) -> Self::Output {
         Point(self.0 * rhs, self.1 * rhs)
     }
 }
 
-impl Mul<Point> for i32 {
-    type Output = Point;
-
-    fn mul(self, rhs: Point) -> Self::Output {
-        rhs * self
-    }
-}
-
-impl Display for Point {
+impl<T: Display> Display for Point<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let (x, y) = (self.0, self.1);
-        write!(f, "({x}, {y})")
+        write!(f, "({}, {})", self.0, self.1)
     }
 }
 
-impl Debug for Point {
+impl<T: Display> Debug for Point<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{self}")
     }

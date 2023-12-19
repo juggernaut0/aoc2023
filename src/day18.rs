@@ -59,38 +59,26 @@ impl FromStr for Instruction {
 }
 
 struct Segment {
-    start: Point,
-    end: Point,
+    start: Point<i64>,
+    end: Point<i64>,
 }
 
 fn find_area(instructions: impl Iterator<Item = Instruction>) -> i64 {
-    let mut area = 0;
-    let mut border_area = 0; // only counts bottom and left borders
+    let area = instructions
+        .scan(Point::zero(), |start, instr| {
+            let end = *start + instr.dir.diff().into() * i64::from(instr.dist);
+            let seg = Segment { start: *start, end };
+            *start = end;
+            Some(seg)
+        })
+        .map(|seg| {
+            if seg.start.0 == seg.end.0 {
+                (seg.start.1 - seg.end.1) * -seg.start.0 + (seg.start.1 - seg.end.1).abs()
+            } else {
+                (seg.start.0 - seg.end.0) * seg.start.1 + (seg.start.0 - seg.end.0).abs()
+            }
+        })
+        .sum::<i64>();
 
-    let mut start = Point::zero();
-
-    for instr in instructions {
-        let end = start + instr.dir.diff() * instr.dist;
-        let seg = Segment { start, end };
-        start = end;
-
-        let (base, height) = if seg.start.0 == seg.end.0 {
-            (i64::from(seg.start.1 - seg.end.1), i64::from(-seg.start.0))
-        } else {
-            (i64::from(seg.start.0 - seg.end.0), i64::from(seg.start.1))
-        };
-        log::debug!("base {base} height {height}");
-        area += base * height;
-
-        if seg.start.0 > seg.end.0 {
-            // bottom border
-            border_area += i64::from(seg.start.0 - seg.end.0);
-        } else if seg.start.1 > seg.end.1 {
-            // left border
-            border_area += i64::from(seg.start.1 - seg.end.1);
-        }
-    }
-
-    // not sure where the 1 comes from
-    area / 2 + border_area + 1
+    area / 2 + 1
 }
