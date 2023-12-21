@@ -45,3 +45,12 @@ pub fn gcd(mut a: u64, mut b: u64) -> u64 {
 pub fn lcm(a: u64, b: u64) -> u64 {
     (a * b) / gcd(a, b)
 }
+
+fn circ_mod(a: i32, b: i32) -> i32 {
+    let r = a % b;
+    if r < 0 {
+        r + b
+    } else {
+        r
+    }
+}

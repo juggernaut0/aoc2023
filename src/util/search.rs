@@ -59,9 +59,7 @@ pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
 
     let mut best = None;
 
-    while !q.is_empty() {
-        let (KeyWithItem(key, s), value_est) = q.pop().unwrap();
-
+    while let Some((KeyWithItem(key, s), value_est)) = q.pop() {
         log::debug!("checking {s:?}, estimate {value_est:?}");
 
         if let Some((_, best_v)) = best.as_ref() {
