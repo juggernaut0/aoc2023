@@ -9,6 +9,10 @@ pub enum Dir {
 }
 
 impl Dir {
+    pub const fn values() -> [Dir; 4] {
+        [Dir::N, Dir::E, Dir::S, Dir::W]
+    }
+
     pub fn turn_left(self) -> Dir {
         match self {
             Dir::N => Dir::W,
@@ -24,6 +28,15 @@ impl Dir {
             Dir::E => Dir::S,
             Dir::S => Dir::W,
             Dir::W => Dir::N,
+        }
+    }
+
+    pub fn opposite(self) -> Dir {
+        match self {
+            Dir::N => Dir::S,
+            Dir::E => Dir::W,
+            Dir::S => Dir::N,
+            Dir::W => Dir::E,
         }
     }
 

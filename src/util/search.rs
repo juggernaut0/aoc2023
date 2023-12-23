@@ -28,6 +28,10 @@ pub trait Searchable: Sized {
     fn break_on_goal() -> bool {
         false
     }
+
+    fn use_value_estimate() -> bool {
+        true
+    }
 }
 
 struct KeyWithItem<S: Searchable>(S::Key, S::State);
@@ -49,26 +53,37 @@ impl<S: Searchable> Eq for KeyWithItem<S> {}
 pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
     let initial_state = search.initial_state();
     let break_on_goal = S::break_on_goal();
+    let use_value_estimate = S::use_value_estimate();
     let mut q = PriorityQueue::new();
     let mut seen = HashMap::new();
     {
         let key = search.key(&initial_state);
-        let value_est = search.value_estimate(&initial_state);
+        let value_est = if use_value_estimate {
+            search.value_estimate(&initial_state)
+        } else {
+            search.value(&initial_state)
+        };
         q.push(KeyWithItem::<S>(key, initial_state), value_est);
     }
 
     let mut best = None;
 
     while let Some((KeyWithItem(key, s), value_est)) = q.pop() {
-        log::debug!("checking {s:?}, estimate {value_est:?}");
+        log::debug!("checking {s:?}, priority {value_est:?}");
 
-        if let Some((_, best_v)) = best.as_ref() {
-            if &value_est <= best_v {
-                continue;
+        if use_value_estimate {
+            if let Some((_, best_v)) = best.as_ref() {
+                if &value_est <= best_v {
+                    continue;
+                }
             }
         }
 
-        let value = search.value(&s);
+        let value = if use_value_estimate {
+            search.value(&s)
+        } else {
+            value_est
+        };
         if let Some(prev_value) = seen.get(&key) {
             if prev_value >= &value {
                 continue;
@@ -95,7 +110,11 @@ pub fn search<S: Searchable>(search: &S) -> Option<(S::State, S::Value)> {
 
         for succ in search.successors(s) {
             let succ_key = search.key(&succ);
-            let succ_value_est = search.value_estimate(&succ);
+            let succ_value_est = if use_value_estimate {
+                search.value_estimate(&succ)
+            } else {
+                search.value(&succ)
+            };
             log::debug!("next {succ:?}, estimate {succ_value_est:?}");
             let mut succ_item = KeyWithItem(succ_key, succ);
             if let Some((a, old_prio)) = q.get_mut(&succ_item) {
