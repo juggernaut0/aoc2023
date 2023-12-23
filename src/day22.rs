@@ -41,11 +41,6 @@ fn settle_bricks(input: &str) -> BrickGraph {
         bricks: parse_lines(input).collect(),
     };
     bricks.bricks.sort_by_key(Brick::bottom);
-    bricks
-        .bricks
-        .iter_mut()
-        .enumerate()
-        .for_each(|(i, b)| b.id = i);
     bricks.settle()
 }
 
@@ -54,7 +49,6 @@ struct Point3(i32, i32, i32);
 
 #[derive(Debug)]
 struct Brick {
-    id: usize,
     start: Point3,
     end: Point3,
 }
@@ -117,8 +111,7 @@ impl FromStr for Brick {
                 iter.next().unwrap().parse().unwrap(),
             )
         };
-        let id = 0;
-        Ok(Brick { id, start, end })
+        Ok(Brick { start, end })
     }
 }
 
@@ -183,9 +176,7 @@ fn supports(graph: &BrickGraph, start: usize) -> usize {
             .copied()
             .filter(|node| {
                 let supported_by = &graph.supported_by[*node];
-                !set.contains(node)
-                    && !supported_by.is_empty()
-                    && supported_by.iter().all(|s| set.contains(s))
+                !supported_by.is_empty() && supported_by.iter().all(|s| set.contains(s))
             })
             .collect_vec();
         if next.is_empty() {
