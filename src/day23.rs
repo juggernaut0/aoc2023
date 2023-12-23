@@ -1,6 +1,5 @@
-use crate::util::{search, Dir, Grid, Point, Searchable};
+use crate::util::{Dir, Grid, Point};
 use itertools::Itertools;
-use std::collections::HashSet;
 
 pub struct Solution;
 
@@ -9,16 +8,16 @@ impl crate::Solution for Solution {
         let maze = Maze::new(input.parse().unwrap(), false);
         log::debug!("nodes: {:#?}", maze.nodes);
         log::debug!("matrix: {:#?}", maze.matrix);
-        let (_, best) = search(&maze).unwrap();
-        best.to_string()
+        maze.search(0, &mut vec![false; maze.nodes.len()])
+            .to_string()
     }
 
     fn solve_2(&self, input: String) -> String {
         let maze = Maze::new(input.parse().unwrap(), true);
         log::info!("{} nodes", maze.nodes.len());
         log::debug!("matrix: {:#?}", maze.matrix);
-        let (_, best) = search(&maze).unwrap();
-        best.to_string()
+        maze.search(0, &mut vec![false; maze.nodes.len()])
+            .to_string()
     }
 }
 
@@ -137,13 +136,34 @@ impl Maze {
         }
         Maze { nodes, matrix }
     }
+
+    fn search(&self, node: usize, visited: &mut [bool]) -> u32 {
+        if node == self.nodes.len() - 1 {
+            return 0;
+        }
+
+        visited[node] = true;
+
+        let res = self.matrix[node]
+            .iter()
+            .enumerate()
+            .filter_map(|(i, it)| {
+                it.filter(|_| !visited[i])
+                    .map(|dist| self.search(i, visited) + dist)
+            })
+            .max()
+            .unwrap_or_default();
+
+        visited[node] = false;
+
+        res
+    }
 }
 
 fn walk(map: &Grid<Tile>, nodes: &[Point], start: Point) -> (u32, Point) {
     let Tile::Slope(start_dir) = map[start] else {
         panic!("not starting on slope");
     };
-    assert!(matches!(map[start], Tile::Slope(_)));
     let mut res = 2;
     let mut last = start;
     let mut current = start + start_dir.diff();
@@ -163,70 +183,4 @@ fn walk(map: &Grid<Tile>, nodes: &[Point], start: Point) -> (u32, Point) {
         current = next;
     };
     (res, dest)
-}
-
-#[derive(Debug)]
-struct State {
-    pos: usize,
-    value: u32,
-    visited: HashSet<usize>,
-}
-
-impl Searchable for Maze {
-    type State = State;
-    type Key = (usize, Vec<usize>);
-    type Value = u32;
-
-    fn initial_state(&self) -> Self::State {
-        State {
-            pos: 0,
-            value: 0,
-            visited: {
-                let mut visited = HashSet::new();
-                visited.insert(0);
-                visited
-            },
-        }
-    }
-
-    fn successors(&self, state: Self::State) -> Vec<Self::State> {
-        self.matrix[state.pos]
-            .iter()
-            .enumerate()
-            .filter_map(|(i, it)| {
-                it.filter(|_| !state.visited.contains(&i))
-                    .map(|dist| State {
-                        pos: i,
-                        value: state.value + dist,
-                        visited: {
-                            let mut visited = state.visited.clone();
-                            visited.insert(i);
-                            visited
-                        },
-                    })
-            })
-            .collect()
-    }
-
-    fn key(&self, state: &Self::State) -> Self::Key {
-        let mut visited = state.visited.iter().copied().collect_vec();
-        visited.sort_unstable();
-        (state.pos, visited)
-    }
-
-    fn value(&self, state: &Self::State) -> Self::Value {
-        state.value
-    }
-
-    fn value_estimate(&self, _state: &Self::State) -> Self::Value {
-        unimplemented!("not using value estimate")
-    }
-
-    fn is_goal(&self, state: &Self::State) -> bool {
-        state.pos == self.nodes.len() - 1
-    }
-
-    fn use_value_estimate() -> bool {
-        false
-    }
 }
