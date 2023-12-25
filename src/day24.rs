@@ -66,7 +66,7 @@ fn parse_line(s: &str) -> (Point3, Point3) {
     (p, v)
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 struct Point3 {
     x: i64,
     y: i64,
@@ -104,4 +104,39 @@ fn intersect_2d(p1: Point3, v1: Point3, p2: Point3, v2: Point3) -> Option<(f64, 
     let t1 = (ix - p1.x as f64) / v1.x as f64;
     let t2 = (ix - p2.x as f64) / v2.x as f64;
     Some((t1, t2, ix, iy))
+}
+
+fn intersect_3d(p1: Point3, v1: Point3, p2: Point3, v2: Point3) -> Option<Point3> {
+    let Some((t1, t2, ix, iy)) = intersect_2d(p1, v1, p2, v2) else { return None; };
+    let t1 = if t1.fract() > 0.0 { return None; } else { t1 as i64 };
+    let t2 = if t2.fract() > 0.0 { return None; } else { t2 as i64 };
+    /*if t1 != t2 {
+        return None;
+    }*/
+
+    let z1 = p1.z + t1 * v1.z;
+    let z2 = p2.z + t2 * v2.z;
+
+    if z1 != z2 {
+        return None;
+    }
+
+    let ix = ix as i64;
+    let iy = iy as i64;
+
+    Some(Point3::new(ix, iy, z1))
+}
+
+mod test {
+    use itertools::assert_equal;
+    use super::*;
+
+    #[test]
+    fn test_intersect_3d() {
+        let i = intersect_3d(
+            Point3::new(19, 13, 30), Point3::new(1, 0, -4),
+            Point3::new(18, 19, 22), Point3::new(2, -2, -4)
+        );
+        assert_equal(Some(Point3::new(24, 13, 10)), i);
+    }
 }
